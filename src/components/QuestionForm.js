@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import QuestionList from "./QuestionList";
+import QuestionItem from "./QuestionItem";
 
-function QuestionForm(props) {
+function QuestionForm(onAddQuestion, onDeleteQuestion) {
   const [formData, setFormData] = useState({
     prompt: "",
     answer1: "",
@@ -9,6 +11,15 @@ function QuestionForm(props) {
     answer4: "",
     correctIndex: 0,
   });
+
+  const [questions, setQuestions] = useState([]);
+
+  useEffect(() => {
+    // Fetch questions from the server
+    fetch("http://localhost:4000/questions")
+      .then((response) => response.json())
+      .then((data) => setQuestions(data));
+  }, []);
 
   function handleChange(event) {
     setFormData({
@@ -19,8 +30,31 @@ function QuestionForm(props) {
 
   function handleSubmit(event) {
     event.preventDefault();
-    console.log(formData);
+    onAddQuestion(formData)
+    setFormData({
+      prompt: "",
+      answer1: "",
+      answer2: "",
+      answer3: "",
+      answer4: "",
+      correctIndex: 0,
+    })
   }
+
+
+  // console.log(formData);
+  function handleDelete() {
+    onDeleteQuestion(formData)
+    setFormData({
+      prompt: "",
+      answer1: "",
+      answer2: "",
+      answer3: "",
+      answer4: "",
+      correctIndex: 0,
+    })
+  }
+  
 
   return (
     <section>
@@ -86,6 +120,10 @@ function QuestionForm(props) {
         </label>
         <button type="submit">Add Question</button>
       </form>
+      <div>
+        <QuestionList questions={questions}/>
+      </div>
+      <button onClick={handleDelete}> Delete Question</button>
     </section>
   );
 }
