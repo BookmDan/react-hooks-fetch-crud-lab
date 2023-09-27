@@ -21,24 +21,47 @@ function QuestionForm(onAddQuestion, onDeleteQuestion) {
       .then((data) => setQuestions(data));
   }, []);
 
-  function handleChange(event) {
+  function handleChange(event, index ) {
+    const { name, value } = event.target;
+    const updatedAnswers = [...formData.answers];
+    updatedAnswers[index] = value;
+
     setFormData({
       ...formData,
-      [event.target.name]: event.target.value,
+      answers: updatedAnswers
+      // [event.target.name]: event.target.value,
     });
   }
 
   function handleSubmit(event) {
     event.preventDefault();
-    onAddQuestion(formData)
+
+    const newQuestion = {
+      prompt: formData.prompt,
+      answers: formData.answers,
+      correctIndex: formData.correctIndex,
+    };
+
+    // Send the form data to the API
+    fetch("http://localhost:4000/questions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(newQuestion),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        onAddQuestion(data); // Update state with the new question
+      })
+      .catch((error) => console.error("Error adding question:", error));
+
+    // Reset the form data after submission
     setFormData({
       prompt: "",
-      answer1: "",
-      answer2: "",
-      answer3: "",
-      answer4: "",
+      answers: ["", "", "", ""],
       correctIndex: 0,
-    })
+    });
   }
 
 
