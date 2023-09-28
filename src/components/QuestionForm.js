@@ -7,10 +7,7 @@ function QuestionForm(onAddQuestion, onDeleteQuestion) {
 
   const [formData, setFormData] = useState({
     prompt: "",
-    answer1: "",
-    answer2: "",
-    answer3: "",
-    answer4: "",
+    answers: ["", "", "", ""],
     correctIndex: 0,
   });
  
@@ -21,56 +18,59 @@ function QuestionForm(onAddQuestion, onDeleteQuestion) {
       .then((data) => setQuestions(data));
   }, []);
 
-  function handleChange(event) {
+  const handleChange = (event) => {
+    const { name, value } = event.target;
     setFormData({
       ...formData,
-      [event.target.name]: event.target.value,
-    });
+      [name]: value,
+    })
   }
 
-  function handleSubmit(event) {
+  const handleAnswerChange = (event, index) => {
+    const updatedAnswers = [...formData.answers];
+    updatedAnswers[index] = event.target.value;
+    setFormData({
+      ...formData,
+      answers: updatedAnswers,
+    });
+  };
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
-
-    const newQuestion = {
-      prompt: formData.prompt,
-      answers: [
-        formData.answer1,
-        formData.answer2,
-        formData.answer3,
-        formData.answer4
-      ],
-      correctIndex: parseInt(formData.correctIndex, 10)
-    };
-
+    // Ensure prompt and answers are not empty
+    if (formData.prompt.trim() === "" || formData.answers.some(answer => answer.trim() === "")) {
+      alert("Please provide a prompt and all answers.");
+      return;
+    }
     // onAddQuestion(formData)
     fetch("http://localhost:4000/questions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(newQuestion)
+      body: JSON.stringify(formData)
     })
       .then(response => response.json())
-      .then(data => {
+      .then(newQuestion => {
         // Update state to display the new question
-        onAddQuestion(data);
+        onAddQuestion(newQuestion);
 
         // Reset the form
         setFormData({
           prompt: "",
-          answer1: "",
-          answer2: "",
-          answer3: "",
-          answer4: "",
+          answers: ["", "", "", ""],
           correctIndex: 0,
-        })
+        });
       })
   }
 
-  // console.log(formData);
- 
-  
 
+
+  
+{/* <div>
+<QuestionList questions={questions}/>
+</div> */}
+  // console.log(formData);
   return (
     <section>
       <h1>New Question</h1>
@@ -135,10 +135,8 @@ function QuestionForm(onAddQuestion, onDeleteQuestion) {
         </label>
         <button type="submit">Add Question</button>
       </form>
-      <div>
-        <QuestionList questions={questions}/>
-      </div>
-      <button onClick={handleDelete}> Delete Question</button>
+   
+      {/* <button onClick={handleDelete}> Delete Question</button> */}
     </section>
   );
 }

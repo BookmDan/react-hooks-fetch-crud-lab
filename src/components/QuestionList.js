@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import QuestionItem from "./QuestionItem";
 
-function QuestionList({questions}) {
+function QuestionList() {
   const [questions, setQuestions] = useState([])
 
   const handleAddQuestion = newQuestion => {
@@ -20,12 +20,10 @@ function QuestionList({questions}) {
   return (
     <section>
       <h1>Quiz Questions</h1>
-      {/* <QuestionList questions={questions} /> */}
+      <QuestionList questions={questions} />
       {/* <QuestionForm onAddQuestion={handleAddQuestion} /> */}
       <ul>
-        {questions.map((question) => (
-          <QuestionItem key={question.id} question={question} />
-        ))}
+        {}
       </ul>
     </section>
   );
